@@ -192,6 +192,7 @@ class ChunkedHTTPRequestHandler(BaseHTTPRequestHandler):
         text = self.query_get(query, "text")
         voiceId = self.query_get(query, "voiceId")
         outputFormat = self.query_get(query, "outputFormat")
+        textType = self.query_get(query, "textType")
 
         # Validate the parameters, set error flag in case of unexpected
         # values
@@ -203,6 +204,7 @@ class ChunkedHTTPRequestHandler(BaseHTTPRequestHandler):
             try:
                 # Request speech synthesis
                 response = polly.synthesize_speech(Text=text,
+                                                    TextType=textType,
                                                     VoiceId=voiceId,
                                                     OutputFormat=outputFormat)
             except (BotoCoreError, ClientError) as err:

@@ -7,9 +7,10 @@ class Voice extends Component {
   }
 
   componentWillMount() {
-    const {text} = this.props;
+    const {text, textType} = this.props;
     const audioSrc = 'http://localhost:8000/read?voiceId=Nicole' +
         '&text=' + text +
+        '&textType=' + textType +
         '&outputFormat=mp3';
     this.setState({audioSrc});
   }
