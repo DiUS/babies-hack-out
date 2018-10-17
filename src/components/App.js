@@ -11,7 +11,7 @@ import classifyVideo from '../Services/classifyVideo';
 class App extends Component {
   constructor(props) {
     super(props);
-    this.initialState = {gameState: "FINDING"};
+    this.initialState = {gameState: "FINDING", ...this.findNewObject()};
     this.video = React.createRef();
   }
 
@@ -103,12 +103,20 @@ class App extends Component {
   }
 
   render() {
-    const {text, textFormat, prediction, gameState} = this.state || this.initialState;
+    const {text, textFormat, voice, prediction, gameState} = this.state || this.initialState;
+
+    let gameStateView = null;
+
+    if (gameState === 'FINDING' || gameState === 'FOUND') {
+      gameStateView = (<Voice text={(voice || {}).text} textType={(voice || {}).textFormat}/>);
+    }
+    
     return (
       <div className="App">
 
         <video ref={this.video} width="640" height="480" autoPlay></video>
 
+        {gameStateView}
 
 
         <Header />
