@@ -18,16 +18,26 @@ class App extends Component {
         video.play();
       })
   }
-  
-  speak = () => {
-    const text = "Hack babies hack";
 
-    this.setState({text})
+  speechPatterns = {
+    find: ["ssml", '<speak>Go find a %</speak>'],
+    found: ["ssml", '<speak>Yay, you found a %</speak>']
+  }
+
+  speak = () => {
+    console.log(">>>>>", this.state);
+    const objects = ["trumpet", "book", "phone", "fork"];
+    const idx = (this.state || {}).idx || 0;
+    const object = objects[idx];
+    const newIdx = (idx+1) % object.length;
+    const [format, textPattern] = this.speechPatterns.find;
+    const text = textPattern.replace("%", object);
+    this.setState({text, textFormat: format, idx: newIdx});
   }
 
   render() {
-    const {text} = this.state || {};
-
+    const {text, textFormat} = this.state || {};
+    console.log(">>>>>", text, textFormat);
     return (
       <div className="App">
         <video id="video" width="640" height="480" autoplay></video>
@@ -36,9 +46,13 @@ class App extends Component {
         <Main />
 
         <button onClick={this.speak}>
-          Speak
+          Say: find
         </button>
-        {text && <Voice text={text} textType={"text"}/>}
+
+        <button onClick={this.speak}>
+          Say: found
+        </button>
+        {text && <Voice text={text} textType={textFormat}/>}
       </div>
     );
   }

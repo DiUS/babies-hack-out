@@ -6,13 +6,21 @@ class Voice extends Component {
     this.player = React.createRef();
   }
 
-  componentWillMount() {
+  url() {
     const {text, textType} = this.props;
     const audioSrc = 'http://localhost:8000/read?voiceId=Nicole' +
         '&text=' + text +
         '&textType=' + textType +
         '&outputFormat=mp3';
-    this.setState({audioSrc});
+    return audioSrc;
+  }
+
+  componentWillMount() {
+    console.log("WM>>>", this.props);
+  }
+
+  componentDidUpdate() {
+    this.player.current.play();
   }
 
   componentDidMount() {
@@ -20,11 +28,9 @@ class Voice extends Component {
   }
 
   render() {
-    const {audioSrc} = this.state;
-
     return (
       <div className="Voice">
-        <audio src={audioSrc} ref={this.player}></audio>
+        <audio src={this.url()} ref={this.player}></audio>
       </div>
     );
   }
