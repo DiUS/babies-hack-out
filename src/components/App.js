@@ -1,22 +1,25 @@
 import React, { Component } from 'react';
+import ml5 from 'ml5';
 
 import './App.css';
 import Header from './Header';
 import Main from './Main';
 import Nav from './Nav';
 import Voice from './Voice';
+import classifyVideo from '../Services/classifyVideo';
 
 class App extends Component {
-  componentDidMount() {
+  async componentDidMount() {
     // Grab elements, create settings, etc.
     const video = document.getElementById('video');
 
     // Create a webcam capture
-    navigator.mediaDevices.getUserMedia({ video: true })
-      .then((stream) => {
-        video.srcObject = stream;
-        video.play();
-      })
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    video.srcObject = stream;
+    video.play();
+
+    const classifier = await ml5.imageClassifier('MobileNet', video);
+    this.setState({classifier});
   }
 
   speechPatterns = {
@@ -25,7 +28,6 @@ class App extends Component {
   }
 
   speak = () => {
-    console.log(">>>>>", this.state);
     const objects = ["trumpet", "book", "phone", "fork"];
     const idx = (this.state || {}).idx || 0;
     const object = objects[idx];
@@ -35,12 +37,17 @@ class App extends Component {
     this.setState({text, textFormat: format, idx: newIdx});
   }
 
+  predict = async () => {
+    const prediction = await classifyVideo(this.state.classifier);
+    this.setState({prediction});
+  }
+
   render() {
-    const {text, textFormat} = this.state || {};
+    const {text, textFormat, prediction} = this.state || {};
     console.log(">>>>>", text, textFormat);
     return (
       <div className="App">
-        <video id="video" width="640" height="480" autoplay></video>
+        <video id="video" width="640" height="480" autoPlay></video>
         <Header />
         <Nav />
         <Main />
@@ -53,6 +60,12 @@ class App extends Component {
           Say: found
         </button>
         {text && <Voice text={text} textType={textFormat}/>}
+
+        <button onClick={this.predict}>
+          Predict
+        </button>
+
+        {prediction && <p>{prediction.result}, {prediction.probability}</p>}
       </div>
     );
   }
