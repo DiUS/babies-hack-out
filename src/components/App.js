@@ -110,7 +110,7 @@ class App extends Component {
     if (gameState === 'FINDING' || gameState === 'FOUND') {
       gameStateView = (<Voice text={(voice || {}).text} textType={(voice || {}).textFormat}/>);
     }
-    
+
     return (
       <div className="App">
 

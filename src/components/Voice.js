@@ -6,13 +6,17 @@ class Voice extends Component {
     this.player = React.createRef();
   }
 
-  url() {
-    const {text, textType} = this.props;
+  buildUrl(text, textType) {
     const audioSrc = 'http://localhost:8000/read?voiceId=Nicole' +
         '&text=' + text +
         '&textType=' + textType +
         '&outputFormat=mp3';
     return audioSrc;
+  }
+
+  urlFromProps = (props) => {
+    const {text, textType} = props || {};
+    return this.buildUrl(text, textType);
   }
 
   componentWillMount() {
@@ -23,6 +27,10 @@ class Voice extends Component {
     this.player.current.play();
   }
 
+  shouldComponentUpdate(nextProps) {
+    return this.buildUrl(nextProps) !== this.buildUrl(this.props);
+  }
+
   componentDidMount() {
     this.player.current.play();
   }
@@ -30,7 +38,7 @@ class Voice extends Component {
   render() {
     return (
       <div className="Voice">
-        <audio src={this.url()} ref={this.player}></audio>
+        <audio src={this.urlFromProps(this.props)} ref={this.player}></audio>
       </div>
     );
   }
