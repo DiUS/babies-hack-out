@@ -12,13 +12,12 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.initialState = {gameState: "FINDING"};
+    this.video = React.createRef();
   }
-
-
 
   async componentDidMount() {
     // Grab elements, create settings, etc.
-    const video = document.getElementById('video');
+    const video = this.video.current;
 
     // Create a webcam capture
     const stream = await navigator.mediaDevices.getUserMedia({ video: true });
@@ -26,9 +25,7 @@ class App extends Component {
     video.play();
 
     const classifier = await ml5.imageClassifier('MobileNet', video);
-
-
-
+    console.log("Got classifier!");
     this.setState({classifier});
   }
 
@@ -45,10 +42,11 @@ class App extends Component {
     return this.speak(this.speechPatterns.found);
   }
 
+  objects = ['trumpet', 'fork', 'duck']
+
   speak = (speechPattern) => {
-    const objects = ["trumpet", "book", "phone", "fork"];
     const idx = (this.state || {}).idx || 0;
-    const object = objects[idx];
+    const object = this.objects[idx];
     const newIdx = (idx+1) % object.length;
     const [format, textPattern] = speechPattern;
     const text = textPattern.replace("%", object);
@@ -56,7 +54,7 @@ class App extends Component {
   }
 
   predict = async () => {
-    const prediction = await classifyVideo(this.state.classifier);
+    const prediction = await classifyVideo((this.state || this.initialState).classifier);
     this.setState({prediction});
   }
 
@@ -87,17 +85,40 @@ class App extends Component {
     } else return state;
   }
 
+  findNewObject = () => {
+    const speechPattern = this.speechPatterns.find;
+    const idx = (this.state || {}).idx || 0;
+    const object = this.objects[idx];
+    const newIdx = (idx+1) % object.length;
+    const [format, textPattern] = speechPattern;
+    const text = textPattern.replace("%", object);
+
+    return {
+      voice: {
+        text, textFormat: format
+      },
+      object,
+      objectIdx: newIdx
+    };
+  }
+
   render() {
     const {text, textFormat, prediction, gameState} = this.state || this.initialState;
     return (
       <div className="App">
-        <video id="video" width="640" height="480" autoPlay></video>
+
+        <video ref={this.video} width="640" height="480" autoPlay></video>
+
+
+
         <Header />
         <Nav />
         <Main />
 
+        <br/><br/><br/>
         <hr/>
         <h5>Debug info:</h5>
+
         {prediction && <p>{prediction.result}, {prediction.probability}</p>}
 
         <p>Game state: {gameState}</p>
