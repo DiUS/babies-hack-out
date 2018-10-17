@@ -64,7 +64,7 @@ ROUTE_READ = "/read"
 
 # Create a client using the credentials and region defined in the adminuser
 # section of the AWS credentials and configuration files
-session = Session(profile_name="default")
+session = Session()
 polly = session.client("polly")
 
 
