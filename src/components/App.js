@@ -33,16 +33,24 @@ class App extends Component {
   }
 
   speechPatterns = {
-    find: ["ssml", '<speak>Go find a %</speak>'],
+    find: ["ssml", '<speak>Go find a <prosody volume="loud" pitch="high"> % </prosody></speak>'],
     found: ["ssml", '<speak>Yay, you found a %</speak>']
   }
 
-  speak = () => {
+  speakFind = () => {
+    return this.speak(this.speechPatterns.find);
+  }
+
+  speakFound = () => {
+    return this.speak(this.speechPatterns.found);
+  }
+
+  speak = (speechPattern) => {
     const objects = ["trumpet", "book", "phone", "fork"];
     const idx = (this.state || {}).idx || 0;
     const object = objects[idx];
     const newIdx = (idx+1) % object.length;
-    const [format, textPattern] = this.speechPatterns.find;
+    const [format, textPattern] = speechPattern;
     const text = textPattern.replace("%", object);
     this.setState({text, textFormat: format, idx: newIdx});
   }
@@ -88,18 +96,18 @@ class App extends Component {
         <Nav />
         <Main />
 
-        {prediction && <p>{prediction.result}, {prediction.probability}</p>}
-
-
         <hr/>
         <h5>Debug info:</h5>
+        {prediction && <p>{prediction.result}, {prediction.probability}</p>}
+
         <p>Game state: {gameState}</p>
+
         <p>
-        <button onClick={this.speak}>
+        <button onClick={this.speakFind}>
           Say: find
         </button>
 
-        <button onClick={this.speak}>
+        <button onClick={this.speakFound}>
           Say: found
         </button>
         {text && <Voice text={text} textType={textFormat}/>}
