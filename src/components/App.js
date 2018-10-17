@@ -9,6 +9,13 @@ import Voice from './Voice';
 import classifyVideo from '../Services/classifyVideo';
 
 class App extends Component {
+  constructor(props) {
+    super(props);
+    this.initialState = {gameState: "FINDING"};
+  }
+
+
+
   async componentDidMount() {
     // Grab elements, create settings, etc.
     const video = document.getElementById('video');
@@ -19,6 +26,9 @@ class App extends Component {
     video.play();
 
     const classifier = await ml5.imageClassifier('MobileNet', video);
+
+
+
     this.setState({classifier});
   }
 
@@ -42,9 +52,35 @@ class App extends Component {
     this.setState({prediction});
   }
 
+  doTransitionState = (signal) => {
+    return () => {
+      console.log(signal, this.state);
+      return this.setState(s => this.transition(s, signal))
+    };
+  }
+
+  gameStates = {
+    "TRAINING": {"play": "FINDING"},
+    "FINDING": {"found-item": "FOUND", "incorrect": "FINDING"},
+    "FOUND": {"next": "FINDING"}
+  }
+
+  nextState(currentState, signal) {
+    return this.gameStates[currentState][signal];
+  }
+
+  transition(state, signal) {
+    const nextState = this.nextState((state || this.initialState).gameState, signal);
+    if (nextState) {
+      return {
+        gameState: this.nextState((state || this.initialState).gameState, signal),
+        ...state
+      };
+    } else return state;
+  }
+
   render() {
-    const {text, textFormat, prediction} = this.state || {};
-    console.log(">>>>>", text, textFormat);
+    const {text, textFormat, prediction, gameState} = this.state || this.initialState;
     return (
       <div className="App">
         <video id="video" width="640" height="480" autoPlay></video>
@@ -52,6 +88,13 @@ class App extends Component {
         <Nav />
         <Main />
 
+        {prediction && <p>{prediction.result}, {prediction.probability}</p>}
+
+
+        <hr/>
+        <h5>Debug info:</h5>
+        <p>Game state: {gameState}</p>
+        <p>
         <button onClick={this.speak}>
           Say: find
         </button>
@@ -64,8 +107,7 @@ class App extends Component {
         <button onClick={this.predict}>
           Predict
         </button>
-
-        {prediction && <p>{prediction.result}, {prediction.probability}</p>}
+        </p>
       </div>
     );
   }
