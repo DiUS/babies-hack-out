@@ -25,7 +25,6 @@ class App extends Component {
           Speak
         </button>
         {text && <Voice text={text} textType={"text"}/>}
-        <Voice text={"Hack babies hack"}/>
       </div>
     );
   }
