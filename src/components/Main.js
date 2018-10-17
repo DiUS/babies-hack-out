@@ -9,14 +9,17 @@ import Play from './Play'
 // and /schedule routes will match any pathname that starts
 // with /roster or /schedule. The / route will only match
 // when the pathname is exactly the string "/"
-const Main = () => (
+function Main(props) {
+  console.log(props.classifier);
+  return (
   <main>
     <Switch>
       <Route exact path='/' component={Home}/>
-      <Route path='/train' component={Train}/>
-      <Route path='/play' component={Play}/>
+      <Route path='/train' component={Train} classifier={props.classifier} />
+      <Route path='/play' component={Play} classifier={props.classifier} />
     </Switch>
   </main>
-)
+  );
+}
 
 export default Main

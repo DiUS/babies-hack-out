@@ -1,25 +1,42 @@
 import React, { Component } from 'react';
-import ml5 from 'ml5';
 
 class Train extends Component{
+
   constructor(props) {
     super(props);
+    this.state = {
+      totalLoss: 0,
+      background: 0,
+      trumpet: 0,
+      duck: 0,
+      fork: 0,
+      loss: 0
+    }
   }
 
-  async componentWillMount() {
-    const featureExtractor = await ml5.featureExtractor('MobileNet');
-    const classifier = featureExtractor.classification(video);
-    this.setState({classifier});
-  }
+  trainClassifier = () => {
+    if (!this.props.classifier) {
+      console.log('classifier not defined');
+      return;
+    }
 
-  trainClassifier() {
-    this.state.classifier.train(function(lossValue) {
+    this.props.classifier.train(lossValue => {
       if (lossValue) {
-        totalLoss = lossValue;
-        loss.innerHTML = 'Loss: ' + totalLoss;
+        this.setState({ totalLoss: lossValue });
+        this.setState({ loss: `Loss: ${this.state.totalLoss}` });
       } else {
-        loss.innerHTML = 'Done Training! Final Loss: ' + totalLoss;
+        this.setState({ loss: `Done Training! Final Loss: ${this.state.totalLoss}` });
       }
+    })
+  }
+
+  addImage = (label) => {
+    if (!this.props.classifier) {
+      console.log('classifier not defined');
+      return;
+    }
+    this.props.classifier.addImage(label);
+    console.log('Image added ', label);
   }
 
   render() {
@@ -28,20 +45,22 @@ class Train extends Component{
         <h2>Train the game</h2>
         <br/>
         <br/>
-        <button onClick={this.state.classifier.addImage('background')}>Add empty background</button>
+        <button onClick={this.addImage.bind(this, 'background')}>Add empty background</button>
         <span> added</span>
         <br/>
-        <button onClick={this.state.classifier.addImage('trumpet')}>Add Trumpet image</button>
+        <button onClick={this.addImage.bind(this, 'trumpet')}>Add Trumpet image</button>
         <span> added</span>
         <br/>
-        <button onClick={this.state.classifier.addImage('duck')}>Add Duck image</button>
+        <button onClick={this.addImage.bind(this, 'duck')}>Add Duck image</button>
         <span> added</span>
         <br/>
-        <button onClick={this.state.classifier.addImage('fork')}>Add Fork image</button>
+        <button onClick={this.addImage.bind(this, 'fork')}>Add Fork image</button>
         <span> added</span>
         <br/>
         <br/>
-        <button onClick={this.trainClassifier()}>Start Training</button>
+        <button onClick={this.trainClassifier}>Start Training</button>
+        <br/>
+        {this.state.loss}
       </div>
     );
   }
