@@ -3,7 +3,7 @@ import './App.css';
 import Header from './Header';
 import Main from './Main';
 import Nav from './Nav';
-import Voice from './components/Voice';
+import Voice from './Voice';
 
 class App extends Component {
   render() {
