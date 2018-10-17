@@ -23,26 +23,28 @@ class App extends Component {
   }
 
   speechPatterns = {
-    find: ["ssml", '<speak>Go find a <prosody volume="loud" pitch="high"> % </prosody></speak>'],
-    found: ["ssml", '<speak>Yay, you found a %</speak>']
+    find: ["ssml", '<speak>Okay! Let\'s find a <break/> <prosody volume="loud"> % </prosody></speak>'],
+    found: ["ssml", '<speak>Yay! Well Done! You found the %</speak>']
   }
 
+  objects = ["trumpet", "book", "phone", "fork"];
+  
   speakFind = () => {
-    return this.speak(this.speechPatterns.find);
+    const idx = (this.state || {}).idx || 0;
+    const object = this.objects[idx];
+    const newIdx = (idx+1) % object.length;
+    const [format, textPattern] = this.speechPatterns.find;
+    const text = textPattern.replace("%", object);
+    this.setState({text, textFormat: format, idx: newIdx, lastIdx: idx});
   }
 
   speakFound = () => {
-    return this.speak(this.speechPatterns.found);
-  }
-
-  speak = (speechPattern) => {
-    const objects = ["trumpet", "book", "phone", "fork"];
+    const lastIdx = (this.state || {}).lastIdx || 0;
     const idx = (this.state || {}).idx || 0;
-    const object = objects[idx];
-    const newIdx = (idx+1) % object.length;
-    const [format, textPattern] = speechPattern;
+    const object = this.objects[lastIdx];
+    const [format, textPattern] = this.speechPatterns.found;
     const text = textPattern.replace("%", object);
-    this.setState({text, textFormat: format, idx: newIdx});
+    this.setState({text, textFormat: format, idx: idx, lastIdx: lastIdx});
   }
 
   predict = async () => {
