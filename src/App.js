@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 
 import './App.css';
-import Voice from './components/voice';
+
 
 class App extends Component {
   render() {
@@ -23,7 +23,6 @@ class App extends Component {
         <container>
 
         </container>
-        <Voice text={"Hack babies hack"}/>
       </div>
     );
   }
